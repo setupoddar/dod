@@ -1,0 +1,26 @@
+# Created by .ignore support plugin (hsz.mobi)
+**/target/*
+*.iml
+*.ipr
+*.iws
+.idea
+.classpath
+.project
+.settings
+.DS_Store
+*.bpmn/
+
+*logs
+*project/project
+*project/target
+*target
+*tmp
+*.history
+*dist
+*.idea
+*out
+*.idea_modules
+*.classpath
+*.project
+*RUNNING_PID
+*.settings

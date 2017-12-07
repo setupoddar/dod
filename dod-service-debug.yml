@@ -1,0 +1,57 @@
+swagger:
+  resourcePackage: dod.resource
+
+########## DROPWIZARD CONFIGURATION ##########
+#https://logback.qos.ch/xref/ch/qos/logback/access/PatternLayout.html
+server:
+  applicationConnectors:
+    - type: http
+      port: 9000
+  adminConnectors:
+    - type: http
+      port: 9001
+  requestLog:
+      appenders:
+        - type: file
+          currentLogFilename: /var/log/dod-access.log
+          threshold: ALL
+          archive: true
+          archivedLogFilenamePattern: /var/log/dod-access.%d.log.gz
+          archivedFileCount: 7
+          logFormat: "%a %date %r %s %b %T"
+
+# Logging settings.
+logging:
+  level: INFO
+  loggers:
+    dod: ALL
+    org.hibernate : ERROR
+  appenders:
+    - type: console
+    - type: file
+      threshold: INFO
+      logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
+      currentLogFilename: /var/log/dod-service.log
+      archivedLogFilenamePattern: /var/log/dod-service-%d{yyyy-MM-dd}-%i.log.gz
+      archivedFileCount: 7
+      timeZone: UTC
+      maxFileSize: 10MB
+
+database:
+  driverClass: com.mysql.jdbc.Driver
+  user: root
+  password:
+  url: jdbc:mysql://localhost/dod?autoReconnect=true
+  properties:
+    charSet: UTF-8
+    hibernate.dialect: org.hibernate.dialect.MySQLDialect
+    hibernate.show_sql: false
+    hibernate.hbm2ddl.auto: create
+  maxWaitForConnection: 30s
+  validationQuery: "SELECT 1"
+  initialSize: 8
+  minSize: 8
+  maxSize: 32
+  minIdleTime: 60s
+  checkConnectionWhileIdle: true
+  validationInterval: 30s
