@@ -11,11 +11,14 @@ import javax.ws.rs.core.MediaType;
 /**
  * Created by setu.poddar on 26/05/17.
  */
-@Path("/application")
+@Path("/tag")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@Api(value = "/application", description = "Application up Related APIs")
+@Api(value = "/tag", description = "Application up Related APIs")
 @Slf4j
 public class ApplicationResource {
+
+
+
 
 }
