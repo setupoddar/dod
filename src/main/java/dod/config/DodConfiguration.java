@@ -20,4 +20,7 @@ public class DodConfiguration extends Configuration {
     @JsonProperty("database")
     private DataSourceFactory dataSourceFactory;
 
+    @JsonProperty("redisConfig")
+    private RedisConfig redisConfig;
+
 }
