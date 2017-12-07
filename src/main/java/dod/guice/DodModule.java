@@ -5,7 +5,11 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import dod.config.DodConfiguration;
 import dod.dal.dao.ProductDAO;
-import dod.dal.model.*;
+import dod.dal.model.Listing;
+import dod.dal.model.Offer;
+import dod.dal.model.Product;
+import dod.dal.model.Tag;
+import dod.service.FederatorService;
 import dod.service.RatingService;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
@@ -32,6 +36,7 @@ public class DodModule extends AbstractModule {
     protected void configure() {
         bind(ProductDAO.class);
         bind(RatingService.class);
+        bind(FederatorService.class);
     }
 
     @Singleton
