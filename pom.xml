@@ -10,7 +10,9 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
+        <jdk.version>1.8</jdk.version>
         <javac.target>1.8</javac.target>
+        <main.basedir>${project.basedir}</main.basedir>
     </properties>
 
     <dependencies>
