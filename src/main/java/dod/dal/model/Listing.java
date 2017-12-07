@@ -28,6 +28,6 @@ public class Listing implements GenericModel {
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "LISTING_OFFER", joinColumns = { @JoinColumn(name = "LISTING_ID") }, inverseJoinColumns = { @JoinColumn(name = "OFFER_ID") })
-    private Set<Offer> metaData = new HashSet<Offer>();
+    private Set<Offer> offers = new HashSet<Offer>();
 
 }

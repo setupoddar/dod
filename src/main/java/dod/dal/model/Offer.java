@@ -25,7 +25,7 @@ public class Offer implements GenericModel {
     @Column(name = "ID")
     private String id;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "OFFER_TAG",
             joinColumns = {@JoinColumn(name = "OFFER_ID")},
             inverseJoinColumns = {@JoinColumn(name = "TAG_ID")})
