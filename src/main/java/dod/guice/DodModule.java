@@ -1,5 +1,6 @@
 package dod.guice;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -12,6 +13,7 @@ import dod.dal.model.Product;
 import dod.dal.model.Tag;
 import dod.service.FederatorService;
 import dod.service.RatingService;
+import dod.service.ZuluService;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.setup.Bootstrap;
@@ -40,6 +42,8 @@ public class DodModule extends AbstractModule {
         bind(ProductDAO.class);
         bind(RatingService.class);
         bind(FederatorService.class);
+        bind(ZuluService.class);
+        bind(ObjectMapper.class);
     }
 
     @Singleton
