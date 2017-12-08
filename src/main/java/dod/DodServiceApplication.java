@@ -48,7 +48,7 @@ public class DodServiceApplication extends Application<DodConfiguration> {
 
     @Override
     public void run(DodConfiguration configuration, Environment environment) throws Exception {
-        environment.jersey().setUrlPattern("/api/*");
+        environment.jersey().setUrlPattern("/*");
         environment.healthChecks().register("ping", new ServiceHealthCheck());
     }
 }
