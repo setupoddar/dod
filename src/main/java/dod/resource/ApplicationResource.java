@@ -9,6 +9,7 @@ import com.sun.org.apache.bcel.internal.generic.TABLESWITCH;
 import dod.Product;
 import dod.service.FederatorService;
 import dod.service.PricingService;
+import dod.service.RatingService;
 import dod.service.ZuluService;
 import io.dropwizard.hibernate.UnitOfWork;
 import io.dropwizard.jersey.params.LongParam;
@@ -40,18 +41,19 @@ import java.util.stream.Collectors;
 public class ApplicationResource {
 
     private final Provider<PricingService> pricingServiceProvider;
-
+    private final RatingService ratingService;
     private ZuluService zuluService;
     private FederatorService federatorService;
 
     private ObjectMapper objectMapper;
 
     @Inject
-    public ApplicationResource(ZuluService zuluService, FederatorService federatorService, ObjectMapper objectMapper, Provider<PricingService> pricingServiceProvider) {
+    public ApplicationResource(ZuluService zuluService, FederatorService federatorService, ObjectMapper objectMapper, Provider<PricingService> pricingServiceProvider, RatingService ratingService) {
         this.zuluService = zuluService;
         this.federatorService = federatorService;
         this.objectMapper = objectMapper;
         this.pricingServiceProvider = pricingServiceProvider;
+        this.ratingService = ratingService;
     }
 
     @GET
@@ -67,6 +69,15 @@ public class ApplicationResource {
             Product product = map.get(s);
             String tag = pricingTags.get(product.getLid());
             product.setTags(Collections.singletonList(tag));
+        }
+
+        Map<String, String> ratingsTagRes = ratingService.getRatingTags(map.keySet().stream().collect(Collectors.toList()));
+        for(String pId : ratingsTagRes.keySet()){
+            Product product = map.get(pId);
+            String tag = ratingsTagRes.get(pId);
+            List<String> existingTag = product.getTags();
+            existingTag.add(tag);
+            product.setTags(existingTag);
         }
         return objectMapper.writeValueAsString(map);
     }
