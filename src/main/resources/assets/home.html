@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <title>Task List</title>
+
+    <script>
+        $(document).ready(function () {
+
+        })
+
+
+        $(function () {
+            $('#search').on('submit', function (e) {
+                e.preventDefault();
+                var url = "http://localhost:9000/api/tag?start=[START]&query=[QUERY]";
+                var start = $('#start').val();
+                var search_text = $('#search_text').val();
+                url = url.replace("[START]", start).replace("[QUERY]", search_text)
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: '{}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    cache: false,
+                    success: function (response) {
+                        var trHTML = '';
+                        $.each(response, function (i, item) {
+                            if(item.lid)
+                            trHTML += '<tr><td>' + item.id
+                            + '</td><td>' + item.lid
+                            + '</td><td>' + item.keyFeatures
+                            + '</td><td>' + item.tags
+                            + '</td></tr>';
+                        });
+                        $('#list').append(trHTML);
+                    }
+                });
+            });
+        });
+
+    </script>
+</head>
+<body>
+
+<center><h2>CREATE TREND</h2>
+
+    <form id="search">
+        Search : <input type="text" id="search_text" name="search_text" required> &nbsp;
+        Start : <input id="start" name="start" required></input><br>
+        <input type="submit" name="submit" value="submit">
+    </form>
+</center>
+<table id="list" border='1'>
+    <tr>
+        <th>FSN</th>
+        <th>LID</th>
+        <th>KEY Features</th>
+        <th>Tags</th>
+    </tr>
+</table>
+</body>
+</html>

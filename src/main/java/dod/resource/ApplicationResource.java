@@ -50,7 +50,7 @@ public class ApplicationResource {
     public String getSubstores(@Context UriInfo uriInfo) throws JsonProcessingException {
         MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
         Map<String, String> pL = federatorService.getFederatorResponse(String.valueOf(queryParameters.getFirst("query")), Integer.valueOf(String.valueOf(queryParameters.getFirst("start"))));
-        return objectMapper.writeValueAsString(zuluService.getResponse(pL));
+        return objectMapper.writeValueAsString(zuluService.getResponse(pL).values());
     }
 
 }

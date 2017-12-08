@@ -6,6 +6,7 @@ import dod.config.DodConfiguration;
 import dod.guice.DodModule;
 import dod.health.ServiceHealthCheck;
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -44,11 +45,13 @@ public class DodServiceApplication extends Application<DodConfiguration> {
                 return configuration.getSwaggerBundleConfiguration();
             }
         });
+
+        bootstrap.addBundle(new AssetsBundle("/assets", "/", "home.html"));
     }
 
     @Override
     public void run(DodConfiguration configuration, Environment environment) throws Exception {
-        environment.jersey().setUrlPattern("/*");
+        environment.jersey().setUrlPattern("/api/*");
         environment.healthChecks().register("ping", new ServiceHealthCheck());
     }
 }
