@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import dod.config.DodConfiguration;
+import dod.config.RedisConfig;
 import dod.dal.dao.ProductDAO;
 import dod.dal.model.Listing;
 import dod.dal.model.Offer;
@@ -51,6 +52,12 @@ public class DodModule extends AbstractModule {
     @Singleton
     public Pool<Jedis> getJedisPool(ManagedJedisPool jedisPool) {
         return jedisPool.getJedisPool();
+    }
+
+    @Provides
+    @Singleton
+    public RedisConfig getRedisConfig(DodConfiguration dodConfiguration){
+        return dodConfiguration.getRedisConfig();
     }
 
 }

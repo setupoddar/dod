@@ -4,9 +4,12 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.Response;
 import redis.clients.jedis.Tuple;
 import redis.clients.util.Pool;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,19 +59,33 @@ public class PricingService {
         return min;
     }
 
-    public Double getLeastPriceInRangeWithCurTime(String listingId, Long timeInMillis, Long curTime){
-        Set<Tuple>responses=null;
+    public String getLeastPriceTagInRange(String listingId, Long timeInMillis){
+        Response<Set<String>> responsesfuture=null;
+        Response<Set<String>> lowestPriceFuture;
+        long curTime = System.currentTimeMillis();
         try (Jedis jedis = jedisPool.getResource()) {
-            responses = jedis.zrangeWithScores(listingId, 0, -1);
+            Pipeline pipeline = jedis.pipelined();
+            responsesfuture = pipeline.zrangeByScore(listingId, ((curTime - timeInMillis)>=0 ? (curTime - timeInMillis) : 0), curTime);
+            lowestPriceFuture = pipeline.zrange(listingId, 0 , 0);
+            pipeline.sync();
         }
-        if(responses==null || responses.isEmpty()) return null;
-        for(Tuple t : responses){
-            long priceTime = Long.parseLong(t.getElement());
-            Double price = t.getScore();
-            if(curTime <= timeInMillis + priceTime ) {
-                return price;
-            }
+        Set<String> responses = responsesfuture.get();
+        if(responses.isEmpty() || responses==null) return null;
+        String lowestP = lowestPriceFuture.get().iterator().next();
+        Long min = Long.MAX_VALUE;
+        for(String t : responses){
+            long l = Long.parseLong(t);
+            if( l< min) min=l;
         }
-        return null;
+        if(min == Long.parseLong(lowestP)) return "Lowest Price in 30 days";
+        return "";
+    }
+
+    public Map<String, String> getTagsForListings(List<String> listingIds){
+        Map<String, String> responseMap = Maps.newHashMap();
+        for(String lid : listingIds){
+            responseMap.put(lid, getLeastPriceTagInRange(lid, Long.MAX_VALUE));
+        }
+        return responseMap;
     }
 }

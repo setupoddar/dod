@@ -55,3 +55,16 @@ database:
   minIdleTime: 60s
   checkConnectionWhileIdle: true
   validationInterval: 30s
+
+
+redisConfig:
+      host: 127.0.0.1
+      port: 6379
+      password:
+      timeout: 10000
+      poolConfig:
+        maxTotal: 30
+        maxIdle: 30
+        minIdle: 20
+        maxWaitMillis: 10000
+        testOnBorrow: true

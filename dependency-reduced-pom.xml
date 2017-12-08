@@ -39,7 +39,19 @@
           </filters>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+  <properties>
+    <jdk.version>1.8</jdk.version>
+    <main.basedir>${project.basedir}</main.basedir>
+    <javac.target>1.8</javac.target>
+  </properties>
 </project>
 

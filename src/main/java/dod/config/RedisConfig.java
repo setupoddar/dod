@@ -14,7 +14,6 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 @NoArgsConstructor
 public class RedisConfig {
 
-    private String masterName;
     private String host;
     private Integer port;
     private String password;

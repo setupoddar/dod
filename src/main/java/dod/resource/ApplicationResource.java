@@ -9,6 +9,8 @@ import com.google.inject.Provider;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by setu.poddar on 26/05/17.
@@ -33,5 +35,12 @@ public class ApplicationResource {
         log.info("getLowestPriceInXDaysTag for listing id {} and days {}", listingId, days.get());
         //TODO Change it to proper day to millis conversion
         return pricingServiceProvider.get().getLeastPriceInRange(listingId, days.get() * 1000000);
+    }
+
+    @POST
+    @Path("/price/bulk")
+    public Map<String, String> getBulkLowestPriceTag(List<String> listingId){
+        log.info("getLowestPriceInXDaysTag for listing ids {} ", listingId.toString());
+        return pricingServiceProvider.get().getTagsForListings(listingId);
     }
 }
