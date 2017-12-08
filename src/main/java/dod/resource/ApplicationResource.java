@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import com.sun.org.apache.bcel.internal.generic.TABLESWITCH;
 import dod.Product;
 import dod.service.FederatorService;
+import dod.service.OfferTags;
 import dod.service.PricingService;
 import dod.service.RatingService;
 import dod.service.ZuluService;
@@ -42,18 +43,21 @@ public class ApplicationResource {
 
     private final Provider<PricingService> pricingServiceProvider;
     private final RatingService ratingService;
+
     private ZuluService zuluService;
     private FederatorService federatorService;
 
     private ObjectMapper objectMapper;
+    private Provider<OfferTags> offerTagsProvider;
 
     @Inject
-    public ApplicationResource(ZuluService zuluService, FederatorService federatorService, ObjectMapper objectMapper, Provider<PricingService> pricingServiceProvider, RatingService ratingService) {
+    public ApplicationResource(ZuluService zuluService, FederatorService federatorService, ObjectMapper objectMapper, Provider<PricingService> pricingServiceProvider, RatingService ratingService, Provider<OfferTags> offerTagsProvider) {
         this.zuluService = zuluService;
         this.federatorService = federatorService;
         this.objectMapper = objectMapper;
         this.pricingServiceProvider = pricingServiceProvider;
         this.ratingService = ratingService;
+        this.offerTagsProvider = offerTagsProvider;
     }
 
     @GET
@@ -65,15 +69,17 @@ public class ApplicationResource {
         Map<String, Product> map = zuluService.getResponse(pL);
         List<String> lids = map.entrySet().stream().map(entry -> entry.getValue().getLid()).collect(Collectors.toCollection(LinkedList::new));
         Map<String, String> pricingTags = getBulkLowestPriceTag(lids);
+        Map<String, String>  offerTag = getTimeTagsForProduct(lids);
         for (String s : map.keySet()) {
             Product product = map.get(s);
             String tag = pricingTags.get(product.getLid());
-            if (tag != null){
-                if(product.getTags() == null)
-                        product.setTags(new ArrayList<String>());
-                    product.getTags().add(tag);
+            if (tag != null) {
+                if (product.getTags() == null)
+                    product.setTags(new ArrayList<String>());
+                product.getTags().add(tag);
+                if(offerTag.get(s) != null)
+                product.getTags().add(offerTag.get(s));
             }
-
         }
 
         map = ratingService.getRatingTags(map);
@@ -95,5 +101,19 @@ public class ApplicationResource {
         List<String> actuals = Lists.newArrayList();
         actuals.addAll(listingId.stream().filter(s -> s != null && !s.isEmpty()).collect(Collectors.toList()));
         return pricingServiceProvider.get().getTagsForListings(actuals);
+    }
+
+    @GET
+    @Path("/time/tags")
+    public Map<String, String> getTimeTagsForProduct(List<String> listingId){
+        try {
+            log.info("getTimeTagsForProduct for listing ids {} ", listingId.toString());
+            List<String> actuals = Lists.newArrayList();
+            actuals.addAll(listingId.stream().filter(s -> s != null && !s.isEmpty()).collect(Collectors.toList()));
+            return offerTagsProvider.get().getOfferTagsForListing(actuals);
+        } catch(Exception ex) {
+            log.error("Exception occured in getTimeTagsForProduct "+ex);
+            return (new HashMap<>());
+        }
     }
 }
