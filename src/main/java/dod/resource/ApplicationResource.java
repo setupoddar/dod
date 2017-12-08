@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import com.sun.org.apache.bcel.internal.generic.TABLESWITCH;
 import dod.Product;
 import dod.service.FederatorService;
+import dod.service.OfferTags;
 import dod.service.PricingService;
 import dod.service.RatingService;
 import dod.service.ZuluService;
@@ -47,13 +48,20 @@ public class ApplicationResource {
 
     private ObjectMapper objectMapper;
 
+    private ZuluService zuluService;
+    private FederatorService federatorService;
+
+    private ObjectMapper objectMapper;
+    private Provider<OfferTags> offerTagsProvider;
+
     @Inject
-    public ApplicationResource(ZuluService zuluService, FederatorService federatorService, ObjectMapper objectMapper, Provider<PricingService> pricingServiceProvider, RatingService ratingService) {
+    public ApplicationResource(ZuluService zuluService, FederatorService federatorService, ObjectMapper objectMapper, Provider<PricingService> pricingServiceProvider, Provider<OfferTags> offerTagsProvider) {
         this.zuluService = zuluService;
         this.federatorService = federatorService;
         this.objectMapper = objectMapper;
         this.pricingServiceProvider = pricingServiceProvider;
         this.ratingService = ratingService;
+        this.offerTagsProvider = offerTagsProvider;
     }
 
     @GET
@@ -70,6 +78,18 @@ public class ApplicationResource {
             String tag = pricingTags.get(product.getLid());
             product.setTags(Collections.singletonList(tag));
         }
+        Map<String, String> offerTags = getTimeTagsForProduct(lids);
+        for(String s : map.keySet()){
+            Product product = map.get(s);
+            String tag = pricingTags.get(product.getLid());
+            List<String> tags = product.getTags();
+            tags.add(tag);
+            product.setTags(tags);
+        }
+
+
+
+
 
         Map<String, String> ratingsTagRes = ratingService.getRatingTags(map.keySet().stream().collect(Collectors.toList()));
         for(String pId : ratingsTagRes.keySet()){
@@ -96,5 +116,18 @@ public class ApplicationResource {
         List<String> actuals = Lists.newArrayList();
         actuals.addAll(listingId.stream().filter(s -> s != null && !s.isEmpty()).collect(Collectors.toList()));
         return pricingServiceProvider.get().getTagsForListings(actuals);
+    }
+    @GET
+    @Path("/time/tags")
+    public Map<String, String> getTimeTagsForProduct(List<String> listingId){
+        try {
+            log.info("getTimeTagsForProduct for listing ids {} ", listingId.toString());
+            List<String> actuals = Lists.newArrayList();
+            actuals.addAll(listingId.stream().filter(s -> s != null && !s.isEmpty()).collect(Collectors.toList()));
+            return offerTagsProvider.get().getOfferTagsForListing(actuals);
+        } catch(Exception ex) {
+            log.error("Exception occured in getTimeTagsForProduct "+ex);
+            return (new HashMap<>());
+        }
     }
 }
