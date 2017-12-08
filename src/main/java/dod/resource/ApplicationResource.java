@@ -65,25 +65,24 @@ public class ApplicationResource {
         Map<String, Product> map = zuluService.getResponse(pL);
         List<String> lids = map.entrySet().stream().map(entry -> entry.getValue().getLid()).collect(Collectors.toCollection(LinkedList::new));
         Map<String, String> pricingTags = getBulkLowestPriceTag(lids);
-        for(String s : map.keySet()){
+        for (String s : map.keySet()) {
             Product product = map.get(s);
             String tag = pricingTags.get(product.getLid());
-            product.setTags(Collections.singletonList(tag));
+            if (tag != null){
+                if(product.getTags() == null)
+                        product.setTags(new ArrayList<String>());
+                    product.getTags().add(tag);
+            }
+
         }
 
-        Map<String, String> ratingsTagRes = ratingService.getRatingTags(map.keySet().stream().collect(Collectors.toList()));
-        for(String pId : ratingsTagRes.keySet()){
-            Product product = map.get(pId);
-            String tag = ratingsTagRes.get(pId);
-            List<String> existingTag = product.getTags();
-            existingTag.add(tag);
-            product.setTags(existingTag);
-        }
+        map = ratingService.getRatingTags(map);
         return objectMapper.writeValueAsString(map);
     }
+
     @GET
     @Path("/price/low/listingId/{listingId}/time/{days}")
-    public Long getLowestPriceInXDaysTag(@PathParam("listingId")String listingId, @PathParam("days")LongParam days){
+    public Long getLowestPriceInXDaysTag(@PathParam("listingId") String listingId, @PathParam("days") LongParam days) {
         log.info("getLowestPriceInXDaysTag for listing id {} and days {}", listingId, days.get());
         //TODO Change it to proper day to millis conversion
         return pricingServiceProvider.get().getLeastPriceInRange(listingId, days.get() * 1000000);
@@ -91,7 +90,7 @@ public class ApplicationResource {
 
     @POST
     @Path("/price/bulk")
-    public Map<String, String> getBulkLowestPriceTag(List<String> listingId){
+    public Map<String, String> getBulkLowestPriceTag(List<String> listingId) {
         log.info("getLowestPriceInXDaysTag for listing ids {} ", listingId.toString());
         List<String> actuals = Lists.newArrayList();
         actuals.addAll(listingId.stream().filter(s -> s != null && !s.isEmpty()).collect(Collectors.toList()));

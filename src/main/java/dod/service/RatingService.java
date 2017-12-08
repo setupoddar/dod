@@ -2,11 +2,10 @@ package dod.service;
 
 import com.google.inject.Inject;
 import dod.dal.dao.ProductDAO;
-import dod.dal.model.Product;
+import dod.Product;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class RatingService {
 
@@ -18,13 +17,16 @@ public class RatingService {
         this.productDAO = productDAO;
     }
 
-    public Map<String, String> getRatingTags(List<String> productIds) {
-        Map<String, String> productRatingMap = new HashMap<String, String>();
-        List<Product> products = productDAO.getProducts(productIds);
-        for (Product product : products) {
-            if (product.getRating() > threshold)
-                productRatingMap.put(product.getId(), "4+ Rated");
+    public Map<String, Product> getRatingTags(Map<String, Product> productIds) {
+        List<dod.dal.model.Product> products = productDAO.getProducts(productIds.keySet().stream().collect(Collectors.toList()));
+        for (dod.dal.model.Product product : products) {
+            if (product.getRating() > threshold) {
+
+                if (productIds.get(product.getId()).getTags() == null)
+                    productIds.get(product.getId()).setTags(new ArrayList());
+                productIds.get(product.getId()).getTags().add("4+ Rated");
+            }
         }
-        return productRatingMap;
+        return productIds;
     }
 }

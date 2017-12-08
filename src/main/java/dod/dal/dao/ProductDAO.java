@@ -13,7 +13,7 @@ import java.util.List;
  * Created by setu.poddar on 27/06/17.
  */
 @Slf4j
-public class ProductDAO extends GenericDAO<Listing> {
+public class ProductDAO extends GenericDAO<Product> {
 
 
     @Inject
